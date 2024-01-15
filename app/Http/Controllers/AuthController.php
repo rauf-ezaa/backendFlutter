@@ -10,12 +10,12 @@ class AuthController extends Controller
 {
     public function register(Request $request){
         $registerUserData = $request->validate([
-            'name'=>'required|string',
+            'username'=>'required|string',
             'email'=>'required|string|email|unique:users',
             'password'=>'required|min:8'
         ]);
         $user = User::create([
-            'name' => $registerUserData['name'],
+            'username' => $registerUserData['username'],
             'email' => $registerUserData['email'],
             'password' => Hash::make($registerUserData['password']),
         ]);
@@ -45,7 +45,9 @@ class AuthController extends Controller
         auth()->user()->tokens()->delete();
     
         return response()->json([
-          "message"=>"logged out"
+          'message'=>'logout successful',
+          'status'=>true
+          
         ]);
     }
 }
