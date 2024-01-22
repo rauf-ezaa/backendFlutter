@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Auth;
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Pesanan;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -64,4 +65,24 @@ class PesananController extends Controller
             'success'=>true
         ]);
     }
+
+	public function konfirmasi(){
+		$user = User::where('id', Auth::user()->id)->first();
+
+        $pesanan = Pesanan::where('user_id', Auth::user()->id)->where('status',0)->first();
+        $pesanan_id = $pesanan->id; 
+        $pesanan->status = 1;
+        $pesanan->update();
+
+        $pesanan_details = PesananDetail::where('pesanan_id', $pesanan_id)->get();
+        foreach ($pesanan_details as $pesanan_detail) {
+			$products = Product::where('id', $pesanan_detail->product_id)->first();
+			// $products->stok = $products->stok-$pesanan_detail->jumlah;
+            $products->update();
+        }
+		return response()->json([
+			'message'=>'Data pesanan telah berhasil diupdate',
+			'status' =>true
+		]);
+	}
 }
